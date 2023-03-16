@@ -1,0 +1,60 @@
+---
+version: "3.1"
+
+services:
+  dispatcher:
+    build: https://github.com/flam-flam/dispatcher-service.git#${DISPATCHER_BRANCH}
+    image: dispatcher-service
+    volumes:
+      - ./dispatcher-config.json:/src/config.json
+    networks:
+      - flam-flam
+    environment:
+      REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID}
+      REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET}
+    depends_on:
+      - comment
+      - submission
+
+  comment:
+    build: https://github.com/flam-flam/comment-service.git#${COMMENT_BRANCH}
+    image: comment-service
+    ports:
+      - 8000:8000
+    networks:
+      - flam-flam
+
+  submission:
+    build: 
+      context: https://github.com/flam-flam/submission-service.git#${SUBMISSION_BRANCH}:src
+      dockerfile: ./flamflam.SubmissionService/Dockerfile
+    image: submission-service
+    ports:
+      - 80:80
+    networks:
+      - flam-flam
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:6.0
+    restart: always
+    pull_policy: missing
+    environment:
+      MONGO_INITDB_DATABASE: flam
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodbconfig_data:/data/configdb
+    ports:
+      - 27017:27017
+    networks:
+      - flam-flam
+
+volumes:
+  mongodb_data:
+  mongodbconfig_data:
+
+networks:
+  flam-flam:
