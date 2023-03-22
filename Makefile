@@ -3,7 +3,7 @@
 
 .PHONY: up
 up: ## Start services defined in compose/docker-compose.yaml
-	@docker compose -f compose/docker-compose.yaml up -d
+	@docker compose --env-file ./.env -f compose/docker-compose.yaml up -d
 
 .PHONY: down
 down: ## Stop services defined in compose/docker-compose.yaml
