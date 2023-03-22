@@ -1,7 +1,7 @@
 {
     "debug": false,
     "comment_endpoint": "http://comment:8000/api/comments",
-    "submission_endpoint": "http://submission:80/api/submissions",
+    "submission_endpoint": "http://submission:8001/api/submissions",
     "subreddits": [
         "all"
     ]
