@@ -26,8 +26,8 @@ services:
 
   submission:
     build: 
-      context: https://github.com/flam-flam/submission-service.git#${SUBMISSION_BRANCH}:src
-      dockerfile: ./flamflam.SubmissionService/Dockerfile
+      context: https://github.com/flam-flam/submission-service.git#${SUBMISSION_BRANCH}:src/flamflam.SubmissionService
+      dockerfile: ./Dockerfile
     image: submission-service
     environment:
       FlamFlamDb:ConnectionString: ${MONGO_CONNECTION_STRING}
