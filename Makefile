@@ -7,19 +7,25 @@ up: ## Start services defined in compose/docker-compose.yaml
 
 .PHONY: down
 down: ## Stop services defined in compose/docker-compose.yaml
-	@docker compose -f compose/docker-compose.yaml down
+	@docker compose --env-file ./.env -f compose/docker-compose.yaml down
 
 .PHONY: test
 test: ## Test a service from a given branch of its repo
-	@grep -v "BRANCH=" compose/.env > compose/test.env && \
+	@grep -v "BRANCH=" ./.env > ./test.env && \
+	echo "Specify a branch for the \033[32mcomment\033[0m service:"; \
+	read -p 'BRANCH: ' branch && \
+	echo COMMENT_BRANCH=$${branch} >> ./test.env && \
 	echo "Specify a branch for the \033[32mdispatcher\033[0m service:"; \
 	read -p 'BRANCH: ' branch && \
-	echo DISPATCHER_BRANCH=$${branch} >> ./compose/test.env && \
+	echo DISPATCHER_BRANCH=$${branch} >> ./test.env && \
 	echo "Specify a branch for the \033[32msubmission\033[0m service:"; \
 	read -p 'BRANCH: ' branch && \
-	echo SUBMISSION_BRANCH=$${branch} >> ./compose/test.env && \
-	docker compose --env-file compose/test.env -f compose/docker-compose.yaml up --build
+	echo SUBMISSION_BRANCH=$${branch} >> ./test.env && \
+	docker compose --env-file ./test.env -f compose/docker-compose.yaml up --build
 
+.PHONY: rebuild
+rebuild: ## Force rebuild of docker images
+	@docker compose --env-file ./.env -f compose/docker-compose.yaml build
 
 .PHONY: help
 help: ## Display this help
