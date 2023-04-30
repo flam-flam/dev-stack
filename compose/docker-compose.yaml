@@ -22,10 +22,7 @@ services:
     image: comment-service
     environment:
       MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING}
-      MONGO_DATABASE: flam
-      MONGO_COLLECTION: comments
-    volumes:
-      - /Users/fratcliffe/Code/flam-flam/comment-service/src:/app/src
+      MONGO_DATABASE_NAME: flam
     ports:
       - 8000:8000
     networks:
