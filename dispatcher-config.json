@@ -1,8 +1,0 @@
-{
-  "debug": false,
-  "comment_endpoint": "http://comment:8000/api/comments",
-  "submission_endpoint": "http://submission/api/submissions",
-  "subreddits": [
-    "all"
-  ]
-}
