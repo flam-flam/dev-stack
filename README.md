@@ -27,7 +27,7 @@ docker version `>=23.0.0`
 
 Run the services in docker:
 ```bash
-make up
+make docker-up
 ```
 
 ## Tilt
@@ -45,18 +45,11 @@ make up
 
 #### Usage
 
-1. Create a KIND cluster:
-
+Run Tilt in a KIND cluster:
 ```bash
-kind create cluster --name flam-flam
+make tilt-up
 ```
 
-2. Run Tilt:
-```bash
-cd tilt
-tilt up
-```
-
-3. Go to http://localhost:10350/ to watch the progress or press s to stream
-the logs in the terminal.
-
+This will start tilt in the foreground. Stopping it with Ctrl-c will stop
+Tilt but won't delete the KIND cluster. Run `make tilt-down` to delete
+cluster or just leave it to be reused next time to run `make tilt-up`.
