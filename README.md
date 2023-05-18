@@ -20,6 +20,7 @@ Configs and setup for running the services locally.
 ## Docker compose
 
 ### Prerequisites
+
 docker version `>=23.0.0`
 
 #### Usage
@@ -31,18 +32,31 @@ make up
 
 ## Tilt
 
+>Note that `Tiltfile` references the helm chart and the docker build path
+>locally for now, so please make sure the `dispatcher-service` and
+>`helm-charts` repos are pulled at the same level as this repo
+>and are up to date.
+
 ### Prerequisites
 
 [Tilt `>=v0.32.0`](https://docs.tilt.dev/install.html)
 
-#### Steps:
+[KIND `>=v0.14.0`](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
-Run tilt:
+#### Usage
+
+1. Create a KIND cluster:
+
+```bash
+kind create cluster --name flam-flam
+```
+
+2. Run Tilt:
 ```bash
 cd tilt
 tilt up
 ```
 
-Note that `Tiltfile` references the helm chart and the docker build path
-locally for now, so please make sure the `dispatcher-service` and
-`helm-charts` repos are pulled at the same level as this repo.
+3. Go to http://localhost:10350/ to watch the progress or press s to stream
+the logs in the terminal.
+
