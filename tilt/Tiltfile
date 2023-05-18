@@ -25,5 +25,5 @@ k8s_yaml(secret_from_dict("dispatcher-service-secrets", inputs={
 k8s_yaml(helm(
     '../../helm-charts/charts/dispatcher-service',
     name="dispatcher-service",
-    values="values/dispatcher-service.yaml"
+    values="helm-values/dispatcher-service.yaml"
 ))
