@@ -2,12 +2,8 @@
 
 Configs and setup for running the services locally.
 
-## Docker compose
+## Secrets
 
-### Pre-requisites
-docker version `>=23.0.0`
-
-#### Steps:
 1. Create new or obtain existing Reddit credentials (required by the [dispatcher](https://github.com/flam-flam/dispatcher-service))
 2. Create a `.env` file ([example](./example.env)):
     ```env
@@ -21,7 +17,39 @@ docker version `>=23.0.0`
     SUBMISSION_BRANCH=main
     ```
 
-3. Run the services in docker:
-    ```bash
-    make up
-    ```
+## Docker compose
+
+### Prerequisites
+
+docker version `>=23.0.0`
+
+#### Usage
+
+Run the services in docker:
+```bash
+make docker-up
+```
+
+## Tilt
+
+>Note that `Tiltfile` references the helm chart and the docker build path
+>locally for now, so please make sure the `dispatcher-service` and
+>`helm-charts` repos are pulled at the same level as this repo
+>and are up to date.
+
+### Prerequisites
+
+[Tilt `>=v0.32.0`](https://docs.tilt.dev/install.html)
+
+[KIND `>=v0.14.0`](https://kind.sigs.k8s.io/docs/user/quick-start/)
+
+#### Usage
+
+Run Tilt in a KIND cluster:
+```bash
+make tilt-up
+```
+
+This will start tilt in the foreground. Stopping it with Ctrl-c will stop
+Tilt but won't delete the KIND cluster. Run `make tilt-down` to delete
+cluster or just leave it to be reused next time to run `make tilt-up`.

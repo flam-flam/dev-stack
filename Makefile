@@ -1,16 +1,27 @@
 .DEFAULT_GOAL := help
 
+CLUSTER_NAME:=flam-flam
 
-.PHONY: up
-up: ## Start services defined in compose/docker-compose.yaml
+
+.PHONY: tilt-up
+tilt-up: ## Create a KIND cluster and start Tilt in foreground
+	@kind get clusters | grep -q ${CLUSTER_NAME} || kind create cluster --name ${CLUSTER_NAME}
+	@cd tilt && tilt up
+
+.PHONY: tilt-down
+tilt-down: ## Delete kind cluster used for tilt
+	@kind delete cluster --name ${CLUSTER_NAME}
+
+.PHONY: docker-up
+docker-up: ## Start services defined in compose/docker-compose.yaml
 	@docker compose --env-file ./.env -f compose/docker-compose.yaml up -d
 
-.PHONY: down
-down: ## Stop services defined in compose/docker-compose.yaml
+.PHONY: docker-down
+docker-down: ## Stop services defined in compose/docker-compose.yaml
 	@docker compose --env-file ./.env -f compose/docker-compose.yaml down
 
-.PHONY: test
-test: ## Test a service from a given branch of its repo
+.PHONY: docker-test
+docker-test: ## Test a service from a given branch of its repo
 	@grep -v "BRANCH=" ./.env > ./test.env && \
 	echo "Specify a branch for the \033[32mcomment\033[0m service:"; \
 	read -p 'BRANCH: ' branch && \
@@ -23,7 +34,7 @@ test: ## Test a service from a given branch of its repo
 	echo SUBMISSION_BRANCH=$${branch} >> ./test.env && \
 	docker compose --env-file ./test.env -f compose/docker-compose.yaml up --build
 
-.PHONY: rebuild
+.PHONY: docker-rebuild
 rebuild: ## Force rebuild of docker images
 	@docker compose --env-file ./.env -f compose/docker-compose.yaml build
 
