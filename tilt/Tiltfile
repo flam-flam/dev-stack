@@ -1,6 +1,6 @@
 # Load the environment variables from the .env file at the root of the repo
 load('ext://dotenv', 'dotenv')
-dotenv(fn="../test.env")
+dotenv(fn="../.env")
 
 load('ext://secret', 'secret_from_dict')
 
