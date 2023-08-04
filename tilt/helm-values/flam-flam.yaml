@@ -1,0 +1,18 @@
+---
+dispatcher-service:
+  secretName: dispatcher-service-secrets
+  image:
+    repository: dispatcher-service
+    tag: dev
+
+comment-service:
+  image:
+    repository: comment-service
+    tag: dev
+
+mongodb:
+  secrets:
+    root:
+      create: true
+    svc:
+      create: true
