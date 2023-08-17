@@ -1,16 +1,22 @@
 .DEFAULT_GOAL := help
 
-CLUSTER_NAME:=flam-flam
+KIND_CLUSTER_NAME:=flam-flam
 
+.PHONY: kind-up
+kind-up: ## Create a kind cluster with a local registry
+	@curl -s https://raw.githubusercontent.com/tilt-dev/kind-local/master/kind-with-registry.sh | KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME} bash -
+
+.PHONY: kind-down
+kind-down: ## Tear down a kind cluster with a local registry
+	@curl -s https://raw.githubusercontent.com/tilt-dev/kind-local/master/teardown-kind-with-registry.sh | KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME} bash -
 
 .PHONY: tilt-up
-tilt-up: ## Create a KIND cluster and start Tilt in foreground
-	@kind get clusters | grep -q ${CLUSTER_NAME} || kind create cluster --name ${CLUSTER_NAME}
+tilt-up: kind-up ## Create a KIND cluster via 'kind-up' and start Tilt in foreground
 	@cd tilt && tilt up
 
 .PHONY: tilt-down
 tilt-down: ## Delete kind cluster used for tilt
-	@kind delete cluster --name ${CLUSTER_NAME}
+	@$(MAKE) kind-down
 
 .PHONY: docker-up
 docker-up: ## Start services defined in compose/docker-compose.yaml
