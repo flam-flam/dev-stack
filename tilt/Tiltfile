@@ -8,6 +8,8 @@ print("""
 -----------------------------------------------------------------
 """.strip())
 
+local_resource("pre-check", cmd="sh pre-check.sh", deps=["pre-check.sh", ".env"])
+
 print("> Loading secrets from .env")
 dotenv(fn="../.env")
 
@@ -49,18 +51,21 @@ k8s_resource(
     'flam-flam-mongodb:serviceaccount',
     'flam-flam-mongodb-root:secret',
     'flam-flam-mongodb-svc:secret'
-  ]
+  ],
+  resource_deps=['pre-check']
 )
 k8s_resource(
   workload='flam-flam-dispatcher-service',
   objects=[
     'flam-flam-dispatcher-service:configmap',
     'flam-flam-dispatcher-service:serviceaccount'
-  ]
+  ],
+  resource_deps=['pre-check']
 )
 k8s_resource(
   workload='flam-flam-comment-service',
   objects=[
     'flam-flam-comment-service:serviceaccount'
-  ]
+  ],
+  resource_deps=['pre-check']
 )
