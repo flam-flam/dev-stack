@@ -1,7 +1,5 @@
 # Load the environment variables from the .env file at the root of the repo
 load('ext://dotenv', 'dotenv')
-dotenv(fn="../.env")
-
 load('ext://secret', 'secret_from_dict')
 
 print("""
@@ -10,20 +8,64 @@ print("""
 -----------------------------------------------------------------
 """.strip())
 
-print("> Building and deploying the dispatcher")
+local_resource("pre-check", cmd="sh pre-check.sh", deps=["pre-check.sh", ".env"])
 
-# Build the dispatcher image with a custom name
-docker_build('dispatcher-service-tilt:dev', '../../dispatcher-service')
+print("> Loading secrets from .env")
+dotenv(fn="../.env")
 
+print("> Building local images")
+# Build the images with a custom name
+docker_build('dispatcher-service:dev', '../../dispatcher-service')
+# docker_build('submission-service:dev', '../../submission-service')
+docker_build('comment-service:dev', '../../comment-service')
+
+print("> Deploying extra manifests")
 # Deploy secrets for the dispatcher
 k8s_yaml(secret_from_dict("dispatcher-service-secrets", inputs={
     'REDDIT_CLIENT_ID': os.getenv('REDDIT_CLIENT_ID'),
     'REDDIT_CLIENT_SECRET': os.getenv('REDDIT_CLIENT_SECRET')
 }))
+# Deploy a PVC for mongodb data
+k8s_yaml("extra-manifests/mongodb-data.yaml")
+k8s_resource(
+  new_name='extraManifests',
+  objects=[
+    'dispatcher-service-secrets:secret',
+    'mongodb-data:persistentvolumeclaim'
+  ]
+)
 
-# Deploy the Helm chart
+print("> Deploying helm charts")
+# Deploy the flam-flam umbrella Helm chart 
 k8s_yaml(helm(
-    '../../helm-charts/charts/dispatcher-service',
-    name="dispatcher-service",
-    values="helm-values/dispatcher-service.yaml"
+    '../../helm-charts/charts/flam-flam',
+    name="flam-flam",
+    values="helm-values/flam-flam.yaml"
 ))
+
+# Assign correct workloads to accounts and configs in the helm chart
+k8s_resource(
+  workload='flam-flam-mongodb',
+  objects=[
+    'flam-flam-mongodb-init-config:configmap',
+    'flam-flam-mongodb:serviceaccount',
+    'flam-flam-mongodb-root:secret',
+    'flam-flam-mongodb-svc:secret'
+  ],
+  resource_deps=['pre-check']
+)
+k8s_resource(
+  workload='flam-flam-dispatcher-service',
+  objects=[
+    'flam-flam-dispatcher-service:configmap',
+    'flam-flam-dispatcher-service:serviceaccount'
+  ],
+  resource_deps=['pre-check']
+)
+k8s_resource(
+  workload='flam-flam-comment-service',
+  objects=[
+    'flam-flam-comment-service:serviceaccount'
+  ],
+  resource_deps=['pre-check']
+)

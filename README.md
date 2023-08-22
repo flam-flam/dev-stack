@@ -33,9 +33,12 @@ make docker-up
 ## Tilt
 
 >Note that `Tiltfile` references the helm chart and the docker build path
->locally for now, so please make sure the `dispatcher-service` and
->`helm-charts` repos are pulled at the same level as this repo
->and are up to date.
+>locally, so please make sure the repos below are pulled at the same level as this repo
+>and are up to date:
+> - `dispatcher-service`
+> - `comment-service`
+> - `submission-service` <-- _not yet, but soon_
+> - `helm-charts`
 
 ### Prerequisites
 
@@ -53,3 +56,5 @@ make tilt-up
 This will start tilt in the foreground. Stopping it with Ctrl-c will stop
 Tilt but won't delete the KIND cluster. Run `make tilt-down` to delete
 cluster or just leave it to be reused next time to run `make tilt-up`.
+
+You can of course still run any `tilt` commands (like `tilt up` or `tilt down`) in the `tilt/` folder.
