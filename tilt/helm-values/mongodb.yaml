@@ -1,0 +1,6 @@
+---
+secrets:
+  root:
+    create: true
+  svc:
+    create: true

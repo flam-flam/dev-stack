@@ -4,7 +4,7 @@ KIND_CLUSTER_NAME:=flam-flam
 
 .PHONY: kind-up
 kind-up: ## Create a kind cluster with a local registry
-	@curl -s https://raw.githubusercontent.com/tilt-dev/kind-local/master/kind-with-registry.sh | KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME} bash -
+	@kind get clusters | grep -q $(KIND_CLUSTER_NAME) && echo "Cluster already exists" || (curl -s https://raw.githubusercontent.com/tilt-dev/kind-local/master/kind-with-registry.sh | KIND_CLUSTER_NAME=${KIND_CLUSTER_NAME} bash -)
 
 .PHONY: kind-down
 kind-down: ## Tear down a kind cluster with a local registry

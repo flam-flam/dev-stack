@@ -1,0 +1,11 @@
+---
+secretName: dispatcher-service-secrets
+image:
+  repository: dispatcher-service
+  tag: dev
+config:
+  debug: false
+  comment_endpoint: "http://comment-service:8000/api/comments"
+  submission_endpoint: "http://submission-service/api/submissions"
+  subreddits:
+    - "all"
