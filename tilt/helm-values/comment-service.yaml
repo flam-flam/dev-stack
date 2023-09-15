@@ -1,0 +1,8 @@
+---
+image:
+  repository: comment-service
+  tag: dev
+mongo:
+  server: mongodb
+  secret:
+    name: mongodb-root
