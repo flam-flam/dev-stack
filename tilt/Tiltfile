@@ -1,6 +1,6 @@
 # Load the environment variables from the .env file at the root of the repo
-load('ext://dotenv', 'dotenv')
-load('ext://secret', 'secret_from_dict')
+load("ext://dotenv", "dotenv")
+load("ext://secret", "secret_from_dict")
 
 print("""
 -----------------------------------------------------------------
@@ -8,32 +8,32 @@ print("""
 -----------------------------------------------------------------
 """.strip())
 
-local_resource("pre-check", cmd="sh pre-check.sh", deps=["pre-check.sh", ".env"])
+local_resource("pre-check",
+    cmd="sh pre-check.sh",
+    deps=[
+        "pre-check.sh",
+        ".env"
+    ],
+    labels=["prerequisites"]
+)
 
 print("> Loading secrets from .env")
 dotenv(fn="../.env")
 
 print("> Building local images")
 # Build the images with a custom name
-docker_build('dispatcher-service:dev', '../../dispatcher-service')
-docker_build('submission-service:dev', '../../submission-service/src/flamflam.SubmissionService')
-docker_build('comment-service:dev', '../../comment-service')
+docker_build("dispatcher-service:dev", "../../dispatcher-service")
+docker_build("submission-service:dev", "../../submission-service/src/flamflam.SubmissionService")
+docker_build("comment-service:dev", "../../comment-service")
 
 print("> Deploying extra manifests")
 # Deploy secrets for the dispatcher
 k8s_yaml(secret_from_dict("dispatcher-service-secrets", inputs={
-    'REDDIT_CLIENT_ID': os.getenv('REDDIT_CLIENT_ID'),
-    'REDDIT_CLIENT_SECRET': os.getenv('REDDIT_CLIENT_SECRET')
+    "REDDIT_CLIENT_ID": os.getenv("REDDIT_CLIENT_ID"),
+    "REDDIT_CLIENT_SECRET": os.getenv("REDDIT_CLIENT_SECRET")
 }))
 # Deploy a PVC for mongodb data
 k8s_yaml("extra-manifests/mongodb-data.yaml")
-k8s_resource(
-    new_name='extraManifests',
-    objects=[
-        'dispatcher-service-secrets:secret',
-        'mongodb-data:persistentvolumeclaim'
-    ]
-)
 
 print("> Deploying helm charts")
 # Deploy the Helm charts
@@ -51,28 +51,48 @@ for chart in charts:
     ))
 
 # Assign correct workloads to accounts and configs in the helm chart
-# k8s_resource(
-#     workload='flam-flam-mongodb',
-#     objects=[
-#         'flam-flam-mongodb-init-config:configmap',
-#         'flam-flam-mongodb:serviceaccount',
-#         'flam-flam-mongodb-root:secret',
-#         'flam-flam-mongodb-svc:secret'
-#     ],
-#     resource_deps=['pre-check']
-# )
-# k8s_resource(
-#     workload='flam-flam-dispatcher-service',
-#     objects=[
-#         'flam-flam-dispatcher-service:configmap',
-#         'flam-flam-dispatcher-service:serviceaccount'
-#     ],
-#     resource_deps=['pre-check']
-# )
-# k8s_resource(
-#     workload='flam-flam-comment-service',
-#     objects=[
-#         'flam-flam-comment-service:serviceaccount'
-#     ],
-#     resource_deps=['pre-check']
-# )
+k8s_resource(
+    new_name="extra-manifests",
+    objects=[
+        "dispatcher-service-secrets:secret",
+        "mongodb-data:persistentvolumeclaim"
+    ],
+    labels=["prerequisites"]
+)
+
+k8s_resource(
+    workload="mongodb",
+    objects=[
+        "mongodb-init-config:configmap",
+        "mongodb:serviceaccount",
+        "mongodb-root:secret",
+        "mongodb-svc:secret"
+    ],
+    resource_deps=["pre-check"],
+    labels=["services"]
+)
+k8s_resource(
+    workload="dispatcher-service",
+    objects=[
+        "dispatcher-service:configmap",
+        "dispatcher-service:serviceaccount"
+    ],
+    resource_deps=["pre-check"],
+    labels=["services"]
+)
+k8s_resource(
+    workload="comment-service",
+    objects=[
+        "comment-service:serviceaccount"
+    ],
+    resource_deps=["pre-check"],
+    labels=["services"]
+)
+k8s_resource(
+    workload="submission-service",
+    objects=[
+        "submission-service:serviceaccount"
+    ],
+    resource_deps=["pre-check"],
+    labels=["services"]
+)
