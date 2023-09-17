@@ -16,7 +16,7 @@ tilt-up: kind-up ## Create a KIND cluster via 'kind-up' and start Tilt in foregr
 
 .PHONY: tilt-down
 tilt-down: ## Delete kind cluster used for tilt
-	@$(MAKE) kind-down
+	@$(MAKE) --no-print-directory kind-down
 
 .PHONY: docker-up
 docker-up: ## Start services defined in compose/docker-compose.yaml
