@@ -5,4 +5,4 @@ image:
 mongo:
   server: mongodb
   secret:
-    name: mongodb-root
+    name: mongodb-svc
