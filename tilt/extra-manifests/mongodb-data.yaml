@@ -5,6 +5,7 @@ metadata:
   name: mongodb-data
 spec:
   storageClassName: standard
+  persistentVolumeReclaimPolicy: Retain
   accessModes:
     - ReadWriteOnce
   resources:
