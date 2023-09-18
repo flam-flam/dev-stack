@@ -80,7 +80,7 @@ k8s_resource(
         "dispatcher-service:configmap",
         "dispatcher-service:serviceaccount"
     ],
-    resource_deps=["pre-check", "comment-service", "submission-service"],
+    resource_deps=["comment-service", "submission-service"],
     labels=["Services"]
 )
 k8s_resource(
@@ -88,7 +88,7 @@ k8s_resource(
     objects=[
         "comment-service:serviceaccount"
     ],
-    resource_deps=["pre-check", "mongodb"],
+    resource_deps=["mongodb"],
     labels=["Services"]
 )
 k8s_resource(
@@ -96,7 +96,7 @@ k8s_resource(
     objects=[
         "submission-service:serviceaccount"
     ],
-    resource_deps=["pre-check", "mongodb"],
+    resource_deps=["mongodb"],
     labels=["Services"]
 )
 k8s_resource(
