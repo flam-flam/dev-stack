@@ -1,0 +1,7 @@
+---
+image:
+  tag: latest
+mongo:
+  server: mongodb
+  secret:
+    name: mongodb-svc

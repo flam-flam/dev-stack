@@ -41,7 +41,8 @@ charts = [
     "mongodb",
     "comment-service",
     "submission-service",
-    "dispatcher-service"
+    "dispatcher-service",
+    "mongo-express"
 ]
 for chart in charts:
     k8s_yaml(helm(
@@ -49,6 +50,8 @@ for chart in charts:
         name=chart,
         values="helm-values/" + chart + ".yaml"
     ))
+
+k8s_resource(workload="mongo-express", port_forwards=8081)
 
 # Assign correct workloads to accounts and configs in the helm chart
 k8s_resource(
@@ -77,7 +80,7 @@ k8s_resource(
         "dispatcher-service:configmap",
         "dispatcher-service:serviceaccount"
     ],
-    resource_deps=["pre-check"],
+    resource_deps=["pre-check", "comment-service", "submission-service"],
     labels=["Services"]
 )
 k8s_resource(
@@ -85,7 +88,7 @@ k8s_resource(
     objects=[
         "comment-service:serviceaccount"
     ],
-    resource_deps=["pre-check"],
+    resource_deps=["pre-check", "mongodb"],
     labels=["Services"]
 )
 k8s_resource(
@@ -93,6 +96,14 @@ k8s_resource(
     objects=[
         "submission-service:serviceaccount"
     ],
-    resource_deps=["pre-check"],
+    resource_deps=["pre-check", "mongodb"],
+    labels=["Services"]
+)
+k8s_resource(
+    workload="mongo-express",
+    objects=[
+        "mongo-express:serviceaccount"
+    ],
+    resource_deps=["mongodb"],
     labels=["Services"]
 )
